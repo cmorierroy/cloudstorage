@@ -14,11 +14,11 @@ import java.util.ArrayList;
 @Service
 public class AuthenticationService implements AuthenticationProvider {
     private UserMapper userMapper;
-    private HashService hashService;
+    private EncryptionService encryptionService;
 
-    public AuthenticationService(UserMapper userMapper, HashService hashService) {
+    public AuthenticationService(UserMapper userMapper, EncryptionService encryptionService) {
         this.userMapper = userMapper;
-        this.hashService = hashService;
+        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -27,10 +27,11 @@ public class AuthenticationService implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         User user = userMapper.getUser(username);
+
         if (user != null) {
             String encodedSalt = user.getSalt();
-            String hashedPassword = hashService.getHashedValue(password, encodedSalt);
-            if (user.getPassword().equals(hashedPassword)) {
+            String decryptedPassword = encryptionService.decryptValue(user.getPassword(), encodedSalt);
+            if (password.equals(decryptedPassword)) {
                 return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
             }
         }
