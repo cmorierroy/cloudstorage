@@ -79,23 +79,24 @@
                             + Add a New Note
                         </button>
 
+                        <!--Table-->
                         <div class="table-responsive">
                             <table class="table table-striped" id="userTable">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20%" scope="col"></th>
+                                        <th style="width: 20%" scope="col">Actions</th>
                                         <th style="width: 20%" scope="col">Title</th>
                                         <th style="width: 60%" scope="col">Description</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody th:each="note: ${notes}">
                                     <tr>
                                         <td>
                                             <button type="button" class="btn btn-success">Edit</button>
-                                            <a class="btn btn-danger">Delete</a>
+                                            <a class="btn btn-danger" th:href="@{'home/note-delete/' + ${note.getId()}}">Delete</a>
                                         </td>
-                                        <th scope="row">Example Note Title</th>
-                                        <td>Example Note Description </td>
+                                        <th scope="row" th:text="${note.getTitle()}">Example Note Title</th>
+                                        <td th:text="${note.getDescription()}">Example Note Description </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -111,15 +112,15 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="#" method="POST">
-                                            <input type="hidden" name="noteId" id="note-id">
+                                        <form action="#" th:object="${note}" th:action="@{/home/note-upload}" method="POST">
+                                            <input type="hidden" name="id" id="note-id">
                                             <div class="form-group">
                                                 <label for="note-title" class="col-form-label">Title</label>
-                                                <input type="text" name= "noteTitle" class="form-control" id="note-title" maxlength="20" required>
+                                                <input type="text" name= "title" class="form-control" id="note-title" maxlength="20" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="note-description" class="col-form-label">Description</label>
-                                                <textarea class="form-control" name="noteDescription" id="note-description" rows="5" maxlength="1000" required></textarea>
+                                                <textarea class="form-control" name="description" id="note-description" rows="5" maxlength="1000" required></textarea>
                                             </div>
                                             <button id="noteSubmit" type="submit" class="d-none"></button>
                                         </form>
