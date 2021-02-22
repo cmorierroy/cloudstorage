@@ -1,10 +1,9 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
-import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
-import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
-import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
+import com.udacity.jwdnd.course1.cloudstorage.services.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +22,19 @@ public class HomeController
     private UserService userService;
     private FileService fileService;
     private NoteService noteService;
+    private CredentialService credentialService;
 
-    public HomeController(UserService userService, FileService fileService, NoteService noteService)
+    public HomeController(UserService userService, FileService fileService, NoteService noteService, CredentialService credentialService)
     {
         this.userService = userService;
         this.fileService = fileService;
         this.noteService = noteService;
+        this.credentialService = credentialService;
+    }
+
+    @ModelAttribute("encryptionService")
+    public EncryptionService getEncryptionServiceDto() {
+        return new EncryptionService();
     }
 
     @GetMapping
@@ -39,6 +45,7 @@ public class HomeController
         //retrieve data
         model.addAttribute("files", fileService.getAllFilesForUserId(userId));
         model.addAttribute("notes", noteService.getAllNotesForUserId(userId));
+        model.addAttribute("credentials", credentialService.getAllCredentialsForUserId(userId));
 
         return "home";
     }
@@ -65,7 +72,31 @@ public class HomeController
     {
         int userId = userService.getUserId(authentication.getName());
 
-        noteService.createNote(note,userId);
+        if(note.getId() != null)
+        {
+            noteService.updateNote(note);
+        }
+        else
+        {
+            noteService.createNote(note,userId);
+        }
+
+        return "result";
+    }
+
+    @PostMapping("/credential-upload")
+    public String uploadCredential(@ModelAttribute("credential") Credential credential, Model model, Authentication authentication)
+    {
+        int userId = userService.getUserId(authentication.getName());
+
+        try
+        {
+            credentialService.createCredential(credential, userId);
+        }
+        catch(IOException e)
+        {
+            model.addAttribute("errorMessage", e.getMessage());
+        }
 
         return "result";
     }
@@ -84,6 +115,12 @@ public class HomeController
         return "result";
     }
 
+    @GetMapping("/credential-delete/{credentialid}")
+    public String deleteCredential(@PathVariable("credentialid") Integer credentialid, Authentication authentication)
+    {
+        credentialService.deleteCredential(credentialid, userService.getUserId(authentication.getName()));
+        return "result";
+    }
 
     @GetMapping("/file-download/{fileName}")
     public ResponseEntity downloadFile(@PathVariable("fileName") String fileName, Authentication authentication)

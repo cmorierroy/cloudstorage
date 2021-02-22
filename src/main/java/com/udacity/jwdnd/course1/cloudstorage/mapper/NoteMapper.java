@@ -18,7 +18,9 @@ public interface NoteMapper
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Note note);
 
-    //NEED AND UPDATE METHOD
+    //Adds userid verification
+    @Update("UPDATE NOTES SET notetitle = #{noteTitle}, notedescription = #{noteDescription} WHERE noteid = #{noteId}")
+    int update(String noteTitle, String noteDescription, int noteId);
 
     @Delete("DELETE FROM NOTES WHERE noteid = #{noteId} AND userid = #{userId}")
     int delete(int noteId, int userId);
