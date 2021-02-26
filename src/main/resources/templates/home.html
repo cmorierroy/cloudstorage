@@ -113,6 +113,9 @@
                                     </div>
                                     <div class="modal-body">
                                         <form action="#" th:object="${note}" th:action="@{/home/note-upload}" method="POST">
+                                            <div th:if="${errorMessage}" class="alert alert-danger">
+                                                <span th:text="${errorMessage}"></span>
+                                            </div>
                                             <input type="hidden" name="id" id="note-id">
                                             <div class="form-group">
                                                 <label for="note-title" class="col-form-label">Title</label>

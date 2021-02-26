@@ -72,13 +72,20 @@ public class HomeController
     {
         int userId = userService.getUserId(authentication.getName());
 
-        if(note.getId() != null)
+        if(note.getDescription().length() > 1000)
         {
-            noteService.updateNote(note);
+            model.addAttribute("errorMessage", "Description character limit is 1000!");
         }
         else
         {
-            noteService.createNote(note,userId);
+            if(note.getId() != null)
+            {
+                noteService.updateNote(note);
+            }
+            else
+            {
+                noteService.createNote(note,userId);
+            }
         }
 
         return "result";
