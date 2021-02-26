@@ -24,7 +24,7 @@ public class FileService
         String fileName = file.getOriginalFilename();
 
         //if file is found, it already exists - throw exception
-        if(fileName == "")
+        if(fileName.isEmpty())
         {
             throw new IOException("Cannot add empty file!");
         }
